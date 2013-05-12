@@ -24,7 +24,7 @@ public class NLPPipeLine {
 		
 		PrintWriter out = null;
 		try {
-			out = new PrintWriter(outputfile+".readable");
+			out = new PrintWriter(outputfile.getAbsolutePath()+".readable");
 			StanfordNLPTool.pipeline.prettyPrint(annotation, out);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -55,8 +55,22 @@ public class NLPPipeLine {
 				outputD.mkdirs();
 			}
 			
-			File outputf = new File(getOutputPath(inputdir,outputdir)+"/"+inputdir.getName()+".toked");
-			doNLP(inputdir, outputf);
+			File outputf = new File(getOutputPath(inputdir,outputdir)+"/"+inputdir.getName()+".nlp");
+			
+			try {
+				doNLP(inputdir, outputf);
+			} catch (Exception e) {
+				File f1 = new File(outputf.getAbsolutePath()+".readable");
+				File f2 = new File(outputf.getAbsolutePath()+".obj");
+				if(f1.exists()){
+					f1.delete();
+				}
+				if(f2.exists()){
+					f2.delete();
+				}
+				e.printStackTrace();
+				return;
+			}
 		
 		}
 	}
