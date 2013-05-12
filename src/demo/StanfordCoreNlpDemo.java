@@ -10,6 +10,7 @@ import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.*;
 
 public class StanfordCoreNlpDemo {
+	
 
 	public static void main(String[] args) throws IOException {
 		PrintWriter out;
@@ -22,17 +23,22 @@ public class StanfordCoreNlpDemo {
 		if (args.length > 2) {
 			xmlOut = new PrintWriter(args[2]);
 		}
-
-		StanfordCoreNLP pipeline = new StanfordCoreNLP();
+		Properties props = new Properties();
+		
+		props.put("annotators",
+				"tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		props.setProperty("tokenize.whitespace", "true");
+		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		Annotation annotation;
 		if (args.length > 0) {
 			annotation = new Annotation(IOUtils.slurpFileNoExceptions(args[0]));
 		} else {
 			annotation = new Annotation(
-					" SUNNYVALE, CA ... January 26, 1994 ... Advanced Micro Devices announced today that it has entered into a long-term agreement under which AMD will supply current and future generations of Microsoft registered trademark Windows trademark -compatible microprocessors to Compaq Computer Corporation.");
+					"Advanced Micro Devices announced today that it has entered into a long-term agreement under which AMD will supply current and future generations of Microsoft Windows - compatible microprocessors to Compaq Computer Corporation . ");
 		}
 
 		pipeline.annotate(annotation);
+		
 		pipeline.prettyPrint(annotation, out);
 		if (xmlOut != null) {
 			pipeline.xmlPrint(annotation, xmlOut);
