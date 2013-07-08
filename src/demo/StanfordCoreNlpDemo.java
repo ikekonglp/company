@@ -34,7 +34,7 @@ public class StanfordCoreNlpDemo {
 			annotation = new Annotation(IOUtils.slurpFileNoExceptions(args[0]));
 		} else {
 			annotation = new Annotation(
-					"Advanced Micro Devices announced today that it has entered into a long-term agreement under which AMD will supply current and future generations of Microsoft Windows - compatible microprocessors to Compaq Computer Corporation . ");
+					"Advanced Micro Devices, 300 miles northwest, today in 5-100 six hours from 9pm to 10am that it has entered into a long-term agreement under which AMD will supply current and future generations of Microsoft Windows - compatible microprocessors to Compaq Computer Corporation . ");
 		}
 
 		pipeline.annotate(annotation);
