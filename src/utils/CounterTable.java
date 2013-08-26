@@ -10,6 +10,7 @@ public class CounterTable{
 	}
 	
 	public void AddCount(String w){
+		w = w.toLowerCase();
 		if(table.containsKey(w)){
 			table.put(w, table.get(w) + 1);
 		}else{
@@ -36,8 +37,8 @@ public class CounterTable{
 	}
 	
 	public int getIndex(String key){
-		if(table.containsKey(key)){
-			return table.get(key);
+		if(table.containsKey(key.toLowerCase())){
+			return table.get(key.toLowerCase());
 		}
 		return -1;
 	}

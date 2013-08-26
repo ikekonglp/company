@@ -46,7 +46,7 @@ public class ConstructCV {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		buildCV(new File("feature"), new File("rep"), 10, 231, new File("CReg"));
+		buildCV(new File("First_Layer_Feature"), new File("First_Layer_Rep"), 10, 1562, new File("CReg"));
 	}
 
 }

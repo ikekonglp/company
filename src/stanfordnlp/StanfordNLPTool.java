@@ -1,11 +1,15 @@
 package stanfordnlp;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import utils.SerializeTool;
+import utils.Stemmer;
+import utils.UtilFunction;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
 import edu.stanford.nlp.io.IOUtils;
@@ -15,10 +19,12 @@ import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
+import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
@@ -39,6 +45,26 @@ public class StanfordNLPTool {
 		Annotation annotation = new Annotation(IOUtils.slurpFileNoExceptions(inFile));
 		pipeline.annotate(annotation);
 		return annotation;
+	}
+	
+	public static List<String> getDependencyParents(CoreMap cm, String w, boolean useReln){
+		ArrayList<String> res = new ArrayList<String>();
+		SemanticGraph dependencies = cm.get(CollapsedCCProcessedDependenciesAnnotation.class);
+		//System.out.println(w + "\t" + UtilFunction.returnString(w));
+		List<IndexedWord> ws = dependencies.getAllNodesByWordPattern(UtilFunction.returnString(w));
+		for(IndexedWord iw : ws){
+			Collection<IndexedWord> rs2 = dependencies.getParents(iw);
+			for(IndexedWord iww: rs2){
+				
+				String m = Stemmer.stem(iww.originalText().trim());
+				if(useReln){
+					GrammaticalRelation gr = dependencies.reln(iww, iw);
+					m = gr.getShortName() + "_" + m;
+				}
+				res.add(m);
+			}	
+		}
+		return res;
 	}
 	
 	public static void main(String[] args) {
@@ -78,6 +104,26 @@ public class StanfordNLPTool {
 	    Map<Integer, CorefChain> graph = 
 	      document.get(CorefChainAnnotation.class);
 		
+	}
+
+	public static List<String> getDependencyChildren(CoreMap cm, String w,
+			boolean useReln) {
+		ArrayList<String> res = new ArrayList<String>();
+		SemanticGraph dependencies = cm.get(CollapsedCCProcessedDependenciesAnnotation.class);
+		//System.out.println(w + "\t" + UtilFunction.returnString(w));
+		List<IndexedWord> ws = dependencies.getAllNodesByWordPattern(UtilFunction.returnString(w));
+		for(IndexedWord iw : ws){
+			Collection<IndexedWord> rs2 = dependencies.getChildren(iw);
+			for(IndexedWord iww: rs2){
+				String m = Stemmer.stem(iww.originalText().trim());
+				if(useReln){
+					GrammaticalRelation gr = dependencies.reln(iw, iww);
+					m = gr.getShortName() + "_" + m;
+				}
+				res.add(m);
+			}	
+		}
+		return res;
 	}
 
 }

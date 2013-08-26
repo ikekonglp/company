@@ -1,10 +1,27 @@
 package utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import annoproc.ReadAnnotation;
+import annoproc.SLAnnotation;
 
 public class ErrorAnalysis {
 	public static HashMap<String, Integer> majorGroupAll = new HashMap<String, Integer>();
+	
+	private static String getLine(int i, File al){
+		LineReader lr = new LineReader(al);
+		while(lr.hasNextLine()){
+			String s = lr.readNextLine().trim();
+			if(s.startsWith(""+i)){
+				lr.closeAll();
+				return s;
+			}
+		}
+		return null;
+		
+	}
 	
 	public static void getStat(File folder, int numberOfFold) {
 		HashMap<String, Integer>[] majorGroup = new HashMap[numberOfFold];
@@ -81,7 +98,7 @@ public class ErrorAnalysis {
 					+ "_test_predict");
 			while(gold.hasNextLine()){
 				String gl = gold.readNextLine().trim();
-				String pl = predict.readNextLine().trim();
+				String pl = predict.readNextLine().replaceAll("\\\\", "").trim();
 				if(gl.equals("")){
 					break;
 				}
@@ -127,14 +144,48 @@ public class ErrorAnalysis {
 		}
 		System.out.println("=====================================");
 	}
+	
+	public static void printError(File dir, int numberOfFold, String ll){
+		for (int i = 0; i < numberOfFold; i++) {
+			LineReader gold = new LineReader(dir.getAbsolutePath() + "/" + i
+					+ "_test_rep");
+			LineReader predict = new LineReader(dir.getAbsolutePath() + "/" + i
+					+ "_test_predict");
+			while(gold.hasNextLine()){
+				String gl = gold.readNextLine().trim();
+				String pl = predict.readNextLine().replaceAll("\\\\", "").trim();
+				if(gl.equals("")){
+					break;
+				}
+				String gid = (gl.split("\t"))[0].trim();
+				String pid = (pl.split("\t"))[0].trim();
+				String gre = (gl.split("\t"))[1].trim();
+				String pre = (pl.split("\t"))[1].trim();
+				
+				if(!gid.equals(pid)){
+					System.err.println("What?");
+					break;
+				}
+				
+				if((gre.equals(ll)) && !gre.equals(pre)){
+					//System.out.println(Integer.parseInt(gid));
+					System.out.println(getLine(Integer.parseInt(gid), new File("al")));
+				}
+			}
+			gold.closeAll();
+			predict.closeAll();
+		}
+	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		
 		getStat(new File("CReg"), 10);
 		confusionMatrix(new File("CReg"), 10);
+		printError(new File("CReg"), 10, "NonCorp");
 	}
 
 }
